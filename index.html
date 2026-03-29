@@ -20,7 +20,18 @@ body { background: #0a0a0f; }
 <script type="text/babel">
 const { useState, useEffect, useRef, useCallback, useMemo } = React;
 
-const PROJECTS=[{id:"golf",name:"経営者ゴルフ部",emoji:"⛳",color:"#FF8C00",milestones:["メンバー10名","初回コンペ","月1開催","GOLFIN連携","30名"],done:[0]},{id:"oitombo",name:"おーいとんぼ合同コンペ",emoji:"🏌️",color:"#FF6B35",milestones:["日程確定","参加者募集","会場確保","開催"],done:[]},{id:"scrum",name:"Scrum Meeting",emoji:"🗓",color:"#2EC4B6",milestones:["47地域展開","毎月開催","参加率向上"],done:[0]},{id:"community",name:"コミュニティ運営",emoji:"👥",color:"#7B68EE",milestones:["部活活性化","新規部活","会員100名","会員300名"],done:[0]},{id:"event",name:"イベント企画",emoji:"🎉",color:"#E040FB",milestones:["年間スケジュール","海外ツアー","スポーツイベント"],done:[]},{id:"member",name:"新規会員獲得",emoji:"🎯",color:"#00B8D4",milestones:["月10名獲得","紹介制度","LP制作","月30名"],done:[]},{id:"sponsor",name:"スポンサー・提携",emoji:"🤝",color:"#66BB6A",milestones:["初回提携","3社提携","10社提携"],done:[]},{id:"ops",name:"OPS・DX化",emoji:"⚡",color:"#FFD700",milestones:["Kai導入","OPS活用","自動化"],done:[0]},{id:"self",name:"個人タスク",emoji:"👤",color:"#78909C",milestones:["日次確立","週次定着"],done:[]},{id:"company",name:"esspride全社",emoji:"🏢",color:"#8D6E63",milestones:["経営計画","売上目標","組織整備"],done:[]}];
+const PROJECTS=[
+{id:"member",name:"会員1万人ロードマップ",emoji:"🎯",color:"#FF8C00",milestones:["100名","500名","1,000名","3,000名","10,000名"],done:[0]},
+{id:"golf",name:"経営者ゴルフ部",emoji:"⛳",color:"#FF6B35",milestones:["メンバー10名","初回コンペ","月1定期開催","GOLFIN連携","50名"],done:[0]},
+{id:"oitombo",name:"おーいとんぼ合同コンペ",emoji:"🏌",color:"#FFB300",milestones:["日程確定","参加者募集","会場確保","初開催","定期化"],done:[]},
+{id:"scrum",name:"Scrum Meeting",emoji:"🗓",color:"#2EC4B6",milestones:["47地域全展開","毎月開催","参加率50%","オンライン統合"],done:[0]},
+{id:"community",name:"コミュニティ活性化",emoji:"👥",color:"#7B68EE",milestones:["既存部活活性化","新規部活3つ","部活横連携","コンテンツ化"],done:[0]},
+{id:"event",name:"イベント企画",emoji:"🎉",color:"#E040FB",milestones:["年間スケジュール確定","大型イベント1回","海外ツアー","スポンサー獲得"],done:[]},
+{id:"acquire",name:"新規会員獲得",emoji:"📣",color:"#00B8D4",milestones:["紹介制度設計","LP制作","月10名","月30名","月100名"],done:[]},
+{id:"sponsor",name:"スポンサー提携",emoji:"🤝",color:"#66BB6A",milestones:["初回提携","3社提携","10社提携","協賛収益化"],done:[]},
+{id:"dx",name:"DX・OPS整備",emoji:"⚡",color:"#FFD700",milestones:["Kai導入","OPS活用","業務自動化","データ分析"],done:[0]},
+{id:"company",name:"esspride全社",emoji:"🏢",color:"#8D6E63",milestones:["経営計画","売上目標","組織整備","IPO準備"],done:[]}
+];
 const PRIORITIES=[{id:"urgent",label:"緊急",emoji:"🔴",sort:0,pts:40,est:30},{id:"high",label:"高",emoji:"🟠",sort:1,pts:25,est:60},{id:"medium",label:"中",emoji:"🟡",sort:2,pts:15,est:60},{id:"low",label:"低",emoji:"🔵",sort:3,pts:10,est:90}];
 const STATUSES=["To Do","Doing","Done"];
 const LEVELS=[{lv:1,title:"インターン",req:0},{lv:2,title:"アソシエイト",req:100},{lv:3,title:"リーダー",req:250},{lv:5,title:"マネージャー",req:500},{lv:8,title:"ディレクター",req:1000},{lv:10,title:"VP",req:1800},{lv:15,title:"SVP",req:3000},{lv:20,title:"CEO",req:5000},{lv:30,title:"上場準備",req:10000},{lv:50,title:"NASDAQ",req:25000}];
