@@ -281,6 +281,23 @@ function App(){
   </div>);
 }
 
+
+const MEMBER_STAGES=[
+{min:0,max:9,emoji:"👶",title:"誕生",desc:"旅は始まったばかり"},
+{min:10,max:29,emoji:"🧒",title:"よちよち",desc:"仲間が増えてきた"},
+{min:30,max:49,emoji:"🏃",title:"歩き始め",desc:"動き出してる！"},
+{min:50,max:99,emoji:"🤸",title:"動き始め",desc:"活気が出てきた"},
+{min:100,max:199,emoji:"💪",title:"筋トレ開始",desc:"100名突破！本格始動"},
+{min:200,max:499,emoji:"🏋️",title:"鍛えてる",desc:"着実に成長中"},
+{min:500,max:999,emoji:"🦾",title:"パワーアップ",desc:"500名！いい感じ"},
+{min:1000,max:2999,emoji:"💥",title:"本気モード",desc:"1,000名突破！全国へ"},
+{min:3000,max:4999,emoji:"🔥",title:"炎のファイター",desc:"3,000名！止まらない"},
+{min:5000,max:7499,emoji:"⚡",title:"超サイヤ人",desc:"5,000名！伝説に近い"},
+{min:7500,max:9999,emoji:"🏆",title:"チャンピオン",desc:"あと少しで伝説！"},
+{min:10000,max:999999,emoji:"👑",title:"LEGEND",desc:"10,000名達成！"}
+];
+const getMemberStage=(n)=>MEMBER_STAGES.find(s=>n>=s.min&&n<=s.max)||MEMBER_STAGES[0];
+
 // ─── SCHEDULE VIEW ─────────────────────────────────────────────
 function SchedView({sch,sa,approve,comp,focus,gs,kaiBriefing,kaiLoading,kaiConnected,onKaiSettings,fetchBriefing,calEvts=[],gSignedIn}){
   const{schedule:blocks,totalPts}=sch;
@@ -289,6 +306,21 @@ function SchedView({sch,sa,approve,comp,focus,gs,kaiBriefing,kaiLoading,kaiConne
   useEffect(()=>{if(!briefingRef.current&&kaiConnected&&!kaiBriefing&&!kaiLoading){briefingRef.current=true;fetchBriefing()}},[kaiConnected]);
 
   if(!sa)return(<div>
+    <div style={{border:"2px solid #E60026",borderRadius:"16px",padding:"20px",marginBottom:"16px",textAlign:"center",background:"#140505"}}>
+      <div style={{fontSize:"72px",marginBottom:"8px",lineHeight:1}}>{stage.emoji}</div>
+      <div style={{fontSize:"20px",fontWeight:700,color:"#FFD700",fontFamily:"JetBrains Mono"}}>{stage.title}</div>
+      <div style={{fontSize:"12px",color:"#aaa",marginBottom:"12px"}}>{stage.desc}</div>
+      <div style={{fontSize:"36px",fontWeight:700,color:"#fff",fontFamily:"JetBrains Mono"}}>{memberCount.toLocaleString()}<span style={{fontSize:"14px",color:"#888",marginLeft:"4px"}}>名</span></div>
+      <div style={{height:10,borderRadius:5,background:"#2a0808",overflow:"hidden",margin:"10px 0"}}>
+        <div style={{height:"100%",borderRadius:5,background:"linear-gradient(90deg,#E60026,#FFD700)",width:memberPct+"%",transition:"width .5s"}}/>
+      </div>
+      <div style={{fontSize:"10px",color:"#888",marginBottom:"12px"}}>{memberPct}% / 目標10,000名　次: {nextStage.emoji} {nextStage.title}（{nextStage.min}名〜）</div>
+      {editMode?(<div style={{display:"flex",gap:"6px",justifyContent:"center"}}>
+        <input type="number" value={tempCount} onChange={e=>setTempCount(e.target.value)} style={{padding:"6px 10px",borderRadius:"6px",border:"1px solid #E60026",background:"#1a0505",color:"#fff",fontSize:"16px",width:"100px",textAlign:"center",fontFamily:"JetBrains Mono"}} autoFocus/>
+        <button onClick={()=>saveMember(tempCount)} style={{padding:"6px 12px",border:"none",borderRadius:"6px",background:"#E60026",color:"#fff",cursor:"pointer",fontFamily:"inherit"}}>更新</button>
+        <button onClick={()=>setEditMode(false)} style={{padding:"6px 12px",border:"1px solid #555",borderRadius:"6px",background:"transparent",color:"#888",cursor:"pointer",fontFamily:"inherit"}}>×</button>
+      </div>):(<button onClick={()=>{setTempCount(String(memberCount));setEditMode(true)}} style={{padding:"6px 16px",border:"1px solid #E60026",borderRadius:"8px",background:"transparent",color:"#E60026",cursor:"pointer",fontSize:"11px",fontFamily:"inherit"}}>✏️ 会員数を更新</button>)}
+    </div>
     <div style={{background:"#141414",borderRadius:"14px",padding:"20px",marginBottom:"16px",border:"1px solid #1a1a2e"}}>
       <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:"12px"}}>
         <div style={{display:"flex",alignItems:"center",gap:"8px"}}>
@@ -433,7 +465,15 @@ function GanttV({tasks,edit,td}){const ref=useRef(null);const[sc,sSc]=useState("
 }
 
 // ─── GROWTH ────────────────────────────────────────────────────
-function GrowthV({tasks,gs,lv,rtn,srm}){const dn=tasks.filter(t=>t.status==="Done").length,tot=tasks.length;const op=Math.round(PROJECTS.reduce((s,p)=>s+(p.done.length/Math.max(p.milestones.length,1)),0)/PROJECTS.length*100);const wp=(gs.weeklyPts||[]).slice(-7),mx=Math.max(...wp.map(w=>w.pts),1);
+function GrowthV({tasks,gs,lv,rtn,srm}){
+  const[memberCount,setMemberCount]=React.useState(()=>{try{return parseInt(localStorage.getItem("club361-members")||"0")}catch{return 0}});
+  const[editMode,setEditMode]=React.useState(false);
+  const[tempCount,setTempCount]=React.useState("0");
+  const stage=getMemberStage(memberCount);
+  const nextStage=MEMBER_STAGES.find(s=>s.min>memberCount)||MEMBER_STAGES[MEMBER_STAGES.length-1];
+  const memberPct=Math.min(100,Math.round((memberCount/10000)*100));
+  const saveMember=(v)=>{const n=parseInt(v)||0;setMemberCount(n);try{localStorage.setItem("club361-members",String(n))}catch(e){}setEditMode(false)};
+  const dn=tasks.filter(t=>t.status==="Done").length,tot=tasks.length;const op=Math.round(PROJECTS.reduce((s,p)=>s+(p.done.length/Math.max(p.milestones.length,1)),0)/PROJECTS.length*100);const wp=(gs.weeklyPts||[]).slice(-7),mx=Math.max(...wp.map(w=>w.pts),1);
   return(<div>
     <div style={{border:"1px solid #1a1a2e",borderRadius:"12px",padding:"16px",marginBottom:"14px",textAlign:"center"}}><div style={{fontSize:"10px",color:"#888"}}>会員1万人への道</div><div style={{fontSize:"28px",fontWeight:700,color:"#E60026",fontFamily:"JetBrains Mono"}}>{op}%</div><div style={{height:8,borderRadius:4,background:"#2a2a2a",overflow:"hidden",margin:"8px 0"}}><div style={{height:"100%",borderRadius:4,background:"linear-gradient(90deg,#2EC4B6,#7B68EE,#FF6B35)",width:`${op}%`}}/></div><div style={{display:"flex",justifyContent:"space-between",fontSize:"8px",color:"#666"}}><span>MVP</span><span>PMF</span><span>SeriesA</span><span>IPO</span><span>1万人達成</span></div></div>
     <div style={{display:"grid",gridTemplateColumns:"repeat(4,1fr)",gap:"6px",marginBottom:"14px"}}>{[{n:gs.streak,l:"ストリーク",c:"#E60026",u:"日"},{n:`Lv.${lv.lv}`,l:lv.title,c:"#E60026"},{n:gs.totalPts,l:"OPS pt",c:"#FFD700"},{n:`${dn}/${tot}`,l:"完了",c:"#66BB6A"}].map((s,i)=>(<div key={i} style={{border:"1px solid #1a1a2e",borderRadius:"8px",padding:"8px",textAlign:"center"}}><div style={{fontSize:"16px",fontWeight:700,color:s.c,fontFamily:"JetBrains Mono"}}>{s.n}{s.u||""}</div><div style={{fontSize:"8px",color:"#888",marginTop:"2px"}}>{s.l}</div></div>))}</div>
