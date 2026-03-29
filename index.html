@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>KEN OPS Dashboard</title>
+<title>club361 OPS Dashboard</title>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
 <style>
 * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -20,12 +20,19 @@ body { background: #0a0a0f; }
 <script type="text/babel">
 const { useState, useEffect, useRef, useCallback, useMemo } = React;
 
-const PROJECTS=[{id:"kai",name:"Kai商品化",emoji:"🔥",color:"#FF6B35",milestones:["MVP完成","決済導入","契約書整備","初課金","月10社"],done:[0]},{id:"golfin",name:"GOLFIN",emoji:"⛳",color:"#2EC4B6",milestones:["β版","GPS実装","ゲーム統合","100ユーザー","トークン"],done:[0]},{id:"funding",name:"資金繰り",emoji:"💰",color:"#E71D36",milestones:["債務整理","返済MAP","売上確保","月次黒字","SeriesA"],done:[0]},{id:"vexum",name:"VEXUM",emoji:"🏢",color:"#7B68EE",milestones:["契約締結","営業方針","初成約","月3件"],done:[0]},{id:"club361",name:"club361°",emoji:"🎯",color:"#FF9F1C",milestones:["運営開始","10名","月次定着"],done:[0]},{id:"sake_nft",name:"日本酒NFT",emoji:"🍶",color:"#D4A574",milestones:["企画確定","パートナー","NFT発行"],done:[]},{id:"pokedao",name:"ポケダオ",emoji:"🎮",color:"#E040FB",milestones:["仕組み設計","ターゲット","ローンチ"],done:[]},{id:"ai_agent",name:"AIエージェント",emoji:"🤖",color:"#00B8D4",milestones:["Kai稼働","並列設計","展開"],done:[0]},{id:"ss_kaikei",name:"SS会計",emoji:"📊",color:"#66BB6A",milestones:["MVP","セキュリティ","本番"],done:[0]},{id:"self",name:"自分自身",emoji:"🧑‍💼",color:"#78909C",milestones:["日次確立","週次定着"],done:[]},{id:"company",name:"全社",emoji:"🏛",color:"#8D6E63",milestones:["株主登記","書類整備","会計","監査"],done:[]},{id:"shinkawa",name:"新川問題",emoji:"⚠️",color:"#FF5252",milestones:["クレカ解決"],done:[]}];
+const PROJECTS=[{id:"golf",name:"経営者ゴルフ部",emoji:"⛳",color:"#FF8C00",milestones:["メンバー10名","初回コンペ","月1開催","GOLFIN連携","30名"],done:[0]},{id:"oitombo",name:"おーいとんぼ合同コンペ",emoji:"🏌️",color:"#FF6B35",milestones:["日程確定","参加者募集","会場確保","開催"],done:[]},{id:"scrum",name:"Scrum Meeting",emoji:"🗓",color:"#2EC4B6",milestones:["47地域展開","毎月開催","参加率向上"],done:[0]},{id:"community",name:"コミュニティ運営",emoji:"👥",color:"#7B68EE",milestones:["部活活性化","新規部活","会員100名","会員300名"],done:[0]},{id:"event",name:"イベント企画",emoji:"🎉",color:"#E040FB",milestones:["年間スケジュール","海外ツアー","スポーツイベント"],done:[]},{id:"member",name:"新規会員獲得",emoji:"🎯",color:"#00B8D4",milestones:["月10名獲得","紹介制度","LP制作","月30名"],done:[]},{id:"sponsor",name:"スポンサー・提携",emoji:"🤝",color:"#66BB6A",milestones:["初回提携","3社提携","10社提携"],done:[]},{id:"ops",name:"OPS・DX化",emoji:"⚡",color:"#FFD700",milestones:["Kai導入","OPS活用","自動化"],done:[0]},{id:"self",name:"個人タスク",emoji:"👤",color:"#78909C",milestones:["日次確立","週次定着"],done:[]},{id:"company",name:"esspride全社",emoji:"🏢",color:"#8D6E63",milestones:["経営計画","売上目標","組織整備"],done:[]}];
 const PRIORITIES=[{id:"urgent",label:"緊急",emoji:"🔴",sort:0,pts:40,est:30},{id:"high",label:"高",emoji:"🟠",sort:1,pts:25,est:60},{id:"medium",label:"中",emoji:"🟡",sort:2,pts:15,est:60},{id:"low",label:"低",emoji:"🔵",sort:3,pts:10,est:90}];
 const STATUSES=["To Do","Doing","Done"];
 const LEVELS=[{lv:1,title:"インターン",req:0},{lv:2,title:"アソシエイト",req:100},{lv:3,title:"リーダー",req:250},{lv:5,title:"マネージャー",req:500},{lv:8,title:"ディレクター",req:1000},{lv:10,title:"VP",req:1800},{lv:15,title:"SVP",req:3000},{lv:20,title:"CEO",req:5000},{lv:30,title:"上場準備",req:10000},{lv:50,title:"NASDAQ",req:25000}];
 
 const INITIAL_TASKS=[
+{id:"1",title:"経営者ゴルフ部 メンバーリスト整理",project:"golf",priority:"high",deadline:"",status:"To Do",note:"GOLFINアプリ連携を想定",est_minutes:60,preferred_time:"morning"},
+{id:"2",title:"おーいとんぼ合同コンペ 日程調整",project:"oitombo",priority:"urgent",deadline:"",status:"To Do",note:"Kenが企画中",est_minutes:45,preferred_time:"morning"},
+{id:"3",title:"次回Scrum Meeting 企画・告知",project:"scrum",priority:"high",deadline:"",status:"To Do",note:"全国47地域",est_minutes:60,preferred_time:"afternoon"},
+{id:"4",title:"新規会員 今月の獲得数確認",project:"member",priority:"medium",deadline:"",status:"To Do",note:"月次レビュー",est_minutes:30,preferred_time:"morning"},
+{id:"5",title:"club361 OPS 活用開始",project:"ops",priority:"high",deadline:"",status:"Doing",note:"Kai AI参謀と連携",est_minutes:30,preferred_time:"any"},
+];
+const _UNUSED_TASKS=[
 {id:"1",title:"日本酒NFT コメント書く",project:"sake_nft",priority:"urgent",deadline:"2026-03-25",status:"To Do",note:"今日中",est_minutes:30,preferred_time:"morning"},
 {id:"2",title:"日本酒NFT MTG準備",project:"sake_nft",priority:"urgent",deadline:"2026-03-26",status:"To Do",note:"",est_minutes:30,preferred_time:"morning"},
 {id:"3",title:"資金繰り：明後日の対応方針",project:"funding",priority:"urgent",deadline:"2026-03-27",status:"To Do",note:"",est_minutes:30,preferred_time:"morning"},
@@ -67,10 +74,11 @@ const DEFAULT_ROUTINES=[
 {id:"r4",title:"週次レビュー",freq:"weekly_mon",time:"10:00",est:30,pts:20,project:"self"},
 ];
 
-const SK="ken-ops-v2";
+const SK="club361-ops-v1";
 const FB_URL="https://ken-ops-default-rtdb.asia-southeast1.firebasedatabase.app";
-const fbGet=async(path)=>{try{const r=await fetch(FB_URL+"/"+path+".json");return await r.json()}catch(e){console.error("FB get error",e);return null}};
-const fbSet=async(path,data)=>{try{await fetch(FB_URL+"/"+path+".json",{method:"PUT",headers:{"Content-Type":"application/json"},body:JSON.stringify(data)})}catch(e){console.error("FB set error",e)}};
+const FB_PATH="club361";
+const fbGet=async(path)=>{try{const r=await fetch(FB_URL+"/"+FB_PATH+"/"+path+".json");return await r.json()}catch(e){console.error("FB get error",e);return null}};
+const fbSet=async(path,data)=>{try{await fetch(FB_URL+"/"+FB_PATH+"/"+path+".json",{method:"PUT",headers:{"Content-Type":"application/json"},body:JSON.stringify(data)})}catch(e){console.error("FB set error",e)}};
 const gP=id=>PROJECTS.find(p=>p.id===id)||PROJECTS[0];
 const gPr=id=>PRIORITIES.find(p=>p.id===id)||PRIORITIES[3];
 const tS=()=>new Date().toISOString().split("T")[0];
@@ -122,7 +130,7 @@ async function fetchGoogleTasks(){try{if(!gapi.client.tasks)return[];const lists
 async function doneGTask(lid,gid){try{await gapi.client.tasks.tasks.patch({tasklist:lid,task:gid,resource:{status:"completed"}})}catch(e){console.error(e)}}
 
 // ─── KAI (OpenClaw) API ──────────────────────────────────────
-const KAI_SETTINGS_KEY="ken-ops-kai";
+const KAI_SETTINGS_KEY="club361-kai";
 function getKaiSettings(){try{const v=localStorage.getItem(KAI_SETTINGS_KEY);return v?JSON.parse(v):null}catch{return null}}
 function saveKaiSettings(s){localStorage.setItem(KAI_SETTINGS_KEY,JSON.stringify(s))}
 
@@ -218,7 +226,7 @@ function App(){
     {cel&&<Cel pts={cel.pts} task={cel.task}/>}
     <div style={{padding:"14px 16px",borderBottom:"1px solid #1a1a2e",background:"linear-gradient(135deg,#0a0a0f,#12121f)"}}>
       <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:"8px",flexWrap:"wrap",gap:"6px"}}>
-        <div style={{display:"flex",alignItems:"center",gap:"8px"}}><span style={{fontSize:"20px"}}>⚡</span><h1 style={{margin:0,fontSize:"16px",fontWeight:700,color:"#fff"}}>KEN OPS</h1><span style={{fontSize:"9px",color:"#555",fontFamily:"JetBrains Mono"}}>v2.1</span></div>
+        <div style={{display:"flex",alignItems:"center",gap:"8px"}}><span style={{fontSize:"20px"}}>⚡</span><h1 style={{margin:0,fontSize:"16px",fontWeight:700,color:"#fff"}}>club361 OPS</h1><span style={{fontSize:"9px",color:"#555",fontFamily:"JetBrains Mono"}}>v2.1</span></div>
         <div style={{display:"flex",gap:"2px"}}>
           {[{id:"schedule",l:"⏰"},{id:"dashboard",l:"📋"},{id:"focus",l:"🎯"},{id:"gantt",l:"📅"},{id:"growth",l:"🚀"}].map(v=>(<button key={v.id} onClick={()=>v.id==="focus"?sf():setView(v.id)} style={{padding:"6px 10px",border:"none",borderRadius:"8px",background:view===v.id?"#1e1e3a":"transparent",color:view===v.id?"#fff":"#555",fontSize:"15px",cursor:"pointer"}}>{v.l}</button>))}
         </div>
