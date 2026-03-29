@@ -80,6 +80,33 @@ const aD=(s,n)=>{const d=new Date(s+"T00:00:00");d.setDate(d.getDate()+n);return
 const dB=(a,b)=>Math.round((new Date(b+"T00:00:00")-new Date(a+"T00:00:00"))/864e5);
 const iSt={width:"100%",padding:"8px 12px",borderRadius:"8px",border:"1px solid #1e1e3a",background:"#0d0d18",color:"#ddd",fontSize:"13px",fontFamily:"inherit",outline:"none",boxSizing:"border-box"};
 const gLv=pts=>{let c=LEVELS[0];for(const l of LEVELS)if(pts>=l.req)c=l;else break;const n=LEVELS.find(l=>l.req>pts)||LEVELS[LEVELS.length-1];return{...c,next:n,pct:n.req>c.req?((pts-c.req)/(n.req-c.req))*100:100,totalPts:pts}};
+const MEMBER_STAGES=[
+  {min:0,max:9,emoji:"👶",title:"誕生",desc:"旅は始まったばかり"},
+  {min:10,max:29,emoji:"🧒",title:"よちよち",desc:"仲間が増えてきた"},
+  {min:30,max:49,emoji:"🏃",title:"歩き始め",desc:"動き出してる！"},
+  {min:50,max:99,emoji:"🤸",title:"動き始め",desc:"活気が出てきた"},
+  {min:100,max:199,emoji:"💪",title:"筋トレ開始",desc:"100名突破！本格始動"},
+  {min:200,max:499,emoji:"🏋️",title:"鍛えてる",desc:"着実に成長中"},
+  {min:500,max:999,emoji:"🦾",title:"パワーアップ",desc:"500名！いい感じ"},
+  {min:1000,max:2999,emoji:"💥",title:"本気モード",desc:"1,000名突破！"},
+  {min:3000,max:4999,emoji:"🔥",title:"炎のファイター",desc:"3,000名！止まらない"},
+  {min:5000,max:7499,emoji:"⚡",title:"超サイヤ人",desc:"5,000名！伝説に近い"},
+  {min:7500,max:9999,emoji:"🏆",title:"チャンピオン",desc:"あと少しで伝説！"},
+  {min:10000,max:999999,emoji:"👑",title:"LEGEND",desc:"10,000名達成！"}
+];
+const getMemberStage=(n)=>MEMBER_STAGES.find(s=>n>=s.min&&n<=s.max)||MEMBER_STAGES[0];
+
+const BADGES=[
+  {id:"first",emoji:"⭐",title:"最初の一歩",desc:"初タスク完了",cond:(gs,mc)=>gs.totalPts>=10},
+  {id:"s7",emoji:"🔥",title:"一週間の男",desc:"7日連続達成",cond:(gs,mc)=>gs.streak>=7},
+  {id:"s30",emoji:"💥",title:"継続の鬼",desc:"30日連続達成",cond:(gs,mc)=>gs.streak>=30},
+  {id:"m100",emoji:"💪",title:"100人の父",desc:"会員100名突破",cond:(gs,mc)=>mc>=100},
+  {id:"m500",emoji:"🦾",title:"500人の男",desc:"会員500名突破",cond:(gs,mc)=>mc>=500},
+  {id:"m1k",emoji:"💥",title:"1000人達成",desc:"会員1,000名突破",cond:(gs,mc)=>mc>=1000},
+  {id:"m10k",emoji:"👑",title:"LEGEND",desc:"会員10,000名達成！",cond:(gs,mc)=>mc>=10000},
+  {id:"pts1k",emoji:"🏆",title:"361°先生",desc:"OPSポイント1,000突破",cond:(gs,mc)=>gs.totalPts>=1000},
+];
+
 const fm=m=>`${String(Math.floor(m/60)).padStart(2,"0")}:${String(m%60).padStart(2,"0")}`;
 
 function genSched(tasks,routines){
@@ -416,8 +443,40 @@ function GanttV({tasks,edit,td}){const ref=useRef(null);const[sc,sSc]=useState("
 }
 
 // ─── GROWTH ────────────────────────────────────────────────────
-function GrowthV({tasks,gs,lv,rtn,srm}){const dn=tasks.filter(t=>t.status==="Done").length,tot=tasks.length;const op=Math.round(PROJECTS.reduce((s,p)=>s+(p.done.length/Math.max(p.milestones.length,1)),0)/PROJECTS.length*100);const wp=(gs.weeklyPts||[]).slice(-7),mx=Math.max(...wp.map(w=>w.pts),1);
+function GrowthV({tasks,gs,lv,rtn,srm}){
+  const[mc,setMc]=React.useState(()=>{try{return parseInt(localStorage.getItem("c361m")||"0")}catch{return 0}});
+  const[editing,setEditing]=React.useState(false);
+  const[tmp,setTmp]=React.useState("0");
+  const stage=getMemberStage(mc);
+  const nextS=MEMBER_STAGES.find(s=>s.min>mc)||MEMBER_STAGES[MEMBER_STAGES.length-1];
+  const mPct=Math.min(100,Math.round((mc/10000)*100));
+  const saveMc=(v)=>{const n=parseInt(v)||0;setMc(n);try{localStorage.setItem("c361m",String(n))}catch(e){}setEditing(false)};
+  const dn=tasks.filter(t=>t.status==="Done").length,tot=tasks.length;const op=Math.round(PROJECTS.reduce((s,p)=>s+(p.done.length/Math.max(p.milestones.length,1)),0)/PROJECTS.length*100);const wp=(gs.weeklyPts||[]).slice(-7),mx=Math.max(...wp.map(w=>w.pts),1);
   return(<div>
+    <div style={{border:"1px solid #E60026",borderRadius:"14px",padding:"16px",marginBottom:"14px",textAlign:"center",background:"#110000"}}>
+      <div style={{fontSize:"60px",lineHeight:1,marginBottom:"4px"}}>{stage.emoji}</div>
+      <div style={{fontSize:"16px",fontWeight:700,color:"#E60026"}}>{stage.title}</div>
+      <div style={{fontSize:"11px",color:"#888",marginBottom:"8px"}}>{stage.desc}</div>
+      <div style={{fontSize:"28px",fontWeight:700,color:"#fff",fontFamily:"JetBrains Mono"}}>{mc.toLocaleString()}<span style={{fontSize:"12px",color:"#888",marginLeft:"3px"}}>名</span></div>
+      <div style={{height:8,borderRadius:4,background:"#2a0000",overflow:"hidden",margin:"8px 0"}}>
+        <div style={{height:"100%",borderRadius:4,background:"linear-gradient(90deg,#E60026,#FFD700)",width:mPct+"%"}}/>
+      </div>
+      <div style={{fontSize:"9px",color:"#666",marginBottom:"8px"}}>{mPct}% / 目標10,000名　次: {nextS.emoji}{nextS.title}（{nextS.min}名〜）</div>
+      {editing?(<div style={{display:"flex",gap:"4px",justifyContent:"center"}}>
+        <input type="number" value={tmp} onChange={e=>setTmp(e.target.value)} style={{padding:"4px 8px",borderRadius:"5px",border:"1px solid #E60026",background:"#110000",color:"#fff",fontSize:"14px",width:"80px",textAlign:"center",fontFamily:"JetBrains Mono"}} autoFocus/>
+        <button onClick={()=>saveMc(tmp)} style={{padding:"4px 8px",border:"none",borderRadius:"5px",background:"#E60026",color:"#fff",cursor:"pointer",fontFamily:"inherit",fontSize:"11px"}}>更新</button>
+        <button onClick={()=>setEditing(false)} style={{padding:"4px 8px",border:"1px solid #444",borderRadius:"5px",background:"transparent",color:"#888",cursor:"pointer",fontFamily:"inherit",fontSize:"11px"}}>×</button>
+      </div>):(<button onClick={()=>{setTmp(String(mc));setEditing(true)}} style={{padding:"4px 12px",border:"1px solid #E60026",borderRadius:"6px",background:"transparent",color:"#E60026",cursor:"pointer",fontSize:"10px",fontFamily:"inherit"}}>✏️ 会員数更新</button>)}
+    </div>
+    <div style={{border:"1px solid #2a2a2a",borderRadius:"10px",padding:"12px",marginBottom:"12px"}}>
+      <div style={{fontSize:"11px",fontWeight:600,color:"#FFD700",marginBottom:"8px"}}>🎖 称号・バッジ</div>
+      <div style={{display:"flex",gap:"6px",flexWrap:"wrap"}}>
+        {BADGES.map(b=>{const ok=b.cond(gs,mc);return(<div key={b.id} style={{padding:"6px 10px",borderRadius:"8px",border:"1px solid "+(ok?"#FFD70044":"#222"),background:ok?"#1a1a00":"transparent",textAlign:"center",minWidth:"60px",opacity:ok?1:0.4}}>
+          <div style={{fontSize:"18px"}}>{b.emoji}</div>
+          <div style={{fontSize:"8px",color:ok?"#FFD700":"#555",marginTop:"1px",fontWeight:ok?600:400}}>{b.title}</div>
+        </div>);})}
+      </div>
+    </div>
     <div style={{border:"1px solid #1a1a2e",borderRadius:"12px",padding:"16px",marginBottom:"14px",textAlign:"center"}}><div style={{fontSize:"10px",color:"#666"}}>会員1万人への道</div><div style={{fontSize:"28px",fontWeight:700,color:"#7B68EE",fontFamily:"JetBrains Mono"}}>{op}%</div><div style={{height:8,borderRadius:4,background:"#1a1a2e",overflow:"hidden",margin:"8px 0"}}><div style={{height:"100%",borderRadius:4,background:"linear-gradient(90deg,#2EC4B6,#7B68EE,#FF6B35)",width:`${op}%`}}/></div><div style={{display:"flex",justifyContent:"space-between",fontSize:"8px",color:"#444"}}><span>MVP</span><span>PMF</span><span>SeriesA</span><span>IPO</span><span>1万名達成</span></div></div>
     <div style={{display:"grid",gridTemplateColumns:"repeat(4,1fr)",gap:"6px",marginBottom:"14px"}}>{[{n:gs.streak,l:"ストリーク",c:"#FF6B35",u:"日"},{n:`Lv.${lv.lv}`,l:lv.title,c:"#7B68EE"},{n:gs.totalPts,l:"OPS pt",c:"#2EC4B6"},{n:`${dn}/${tot}`,l:"完了",c:"#66BB6A"}].map((s,i)=>(<div key={i} style={{border:"1px solid #1a1a2e",borderRadius:"8px",padding:"8px",textAlign:"center"}}><div style={{fontSize:"16px",fontWeight:700,color:s.c,fontFamily:"JetBrains Mono"}}>{s.n}{s.u||""}</div><div style={{fontSize:"8px",color:"#555",marginTop:"2px"}}>{s.l}</div></div>))}</div>
     {wp.length>0&&<div style={{border:"1px solid #1a1a2e",borderRadius:"10px",padding:"14px",marginBottom:"14px"}}><div style={{fontSize:"11px",fontWeight:500,color:"#ddd",marginBottom:"8px"}}>OPSポイント推移</div><div style={{display:"flex",alignItems:"flex-end",gap:"3px",height:"50px"}}>{wp.map((w,i)=>(<div key={i} style={{flex:1,display:"flex",flexDirection:"column",alignItems:"center",gap:"2px"}}><span style={{fontSize:"7px",color:"#555",fontFamily:"JetBrains Mono"}}>{w.pts}</span><div style={{width:"100%",height:`${Math.max(3,(w.pts/mx)*42)}px`,borderRadius:2,background:i===wp.length-1?"#FF6B35":"#7B68EE"}}/><span style={{fontSize:"7px",color:"#444"}}>{w.date.slice(5)}</span></div>))}</div></div>}
