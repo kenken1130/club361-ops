@@ -298,6 +298,49 @@ const MEMBER_STAGES=[
 ];
 const getMemberStage=(n)=>MEMBER_STAGES.find(s=>n>=s.min&&n<=s.max)||MEMBER_STAGES[0];
 
+const BADGES=[
+{id:"first_task",emoji:"⭐",title:"最初の一歩",desc:"初タスク完了",condition:(gs,mc)=>gs.totalPts>=10},
+{id:"streak7",emoji:"🔥",title:"一週間の男",desc:"7日連続達成",condition:(gs,mc)=>gs.streak>=7},
+{id:"streak30",emoji:"💥",title:"継続の鬼",desc:"30日連続達成",condition:(gs,mc)=>gs.streak>=30},
+{id:"member100",emoji:"💪",title:"100人の父",desc:"会員100名突破",condition:(gs,mc)=>mc>=100},
+{id:"member500",emoji:"🦾",title:"500人の男",desc:"会員500名突破",condition:(gs,mc)=>mc>=500},
+{id:"member1000",emoji:"💥",title:"1000人達成",desc:"会員1,000名突破",condition:(gs,mc)=>mc>=1000},
+{id:"member10000",emoji:"👑",title:"LEGEND",desc:"会員10,000名達成！",condition:(gs,mc)=>mc>=10000},
+{id:"golf_master",emoji:"⛳",title:"ゴルフマスター",desc:"ゴルフ部タスク10件完了",condition:(gs,mc,tasks)=>tasks&&tasks.filter(t=>t.project==="golf"&&t.status==="Done").length>=10},
+{id:"scrum_master",emoji:"🗓",title:"Scrum魂",desc:"Scrum関連タスク10件完了",condition:(gs,mc,tasks)=>tasks&&tasks.filter(t=>t.project==="scrum"&&t.status==="Done").length>=10},
+{id:"points1000",emoji:"🏆",title:"361°先生",desc:"OPSポイント1,000突破",condition:(gs,mc)=>gs.totalPts>=1000},
+{id:"sponsor",emoji:"🤝",title:"スポンサーキング",desc:"スポンサー関連タスク完了",condition:(gs,mc,tasks)=>tasks&&tasks.filter(t=>t.project==="sponsor"&&t.status==="Done").length>=3},
+{id:"japan",emoji:"🌏",title:"日本制覇",desc:"全国展開達成",condition:(gs,mc,tasks)=>tasks&&tasks.filter(t=>t.project==="scrum"&&t.status==="Done").length>=20},
+];
+
+function BadgesPanel({gs,memberCount,tasks}){
+  const earned=BADGES.filter(b=>b.condition(gs,memberCount,tasks));
+  const notEarned=BADGES.filter(b=>!b.condition(gs,memberCount,tasks));
+  return(<div style={{marginTop:"16px"}}>
+    <div style={{fontSize:"12px",fontWeight:600,color:"#FFD700",marginBottom:"8px"}}>🎖 称号・バッジ</div>
+    {earned.length>0&&<div style={{marginBottom:"12px"}}>
+      <div style={{fontSize:"9px",color:"#888",marginBottom:"6px"}}>獲得済み ({earned.length})</div>
+      <div style={{display:"flex",gap:"8px",flexWrap:"wrap"}}>
+        {earned.map(b=><div key={b.id} style={{padding:"8px 12px",borderRadius:"10px",background:"linear-gradient(135deg,#E6002220,#FFD70020)",border:"1px solid #FFD70044",textAlign:"center",minWidth:"70px"}}>
+          <div style={{fontSize:"24px"}}>{b.emoji}</div>
+          <div style={{fontSize:"9px",color:"#FFD700",fontWeight:600,marginTop:"2px"}}>{b.title}</div>
+          <div style={{fontSize:"7px",color:"#888"}}>{b.desc}</div>
+        </div>)}
+      </div>
+    </div>}
+    {notEarned.length>0&&<div>
+      <div style={{fontSize:"9px",color:"#555",marginBottom:"6px"}}>未獲得 ({notEarned.length})</div>
+      <div style={{display:"flex",gap:"6px",flexWrap:"wrap"}}>
+        {notEarned.map(b=><div key={b.id} style={{padding:"6px 10px",borderRadius:"8px",background:"#1a1a1a",border:"1px solid #333",textAlign:"center",minWidth:"60px",opacity:0.5}}>
+          <div style={{fontSize:"20px",filter:"grayscale(1)"}}>{b.emoji}</div>
+          <div style={{fontSize:"8px",color:"#555",marginTop:"2px"}}>{b.title}</div>
+        </div>)}
+      </div>
+    </div>}
+  </div>)
+}
+
+
 // ─── SCHEDULE VIEW ─────────────────────────────────────────────
 function SchedView({sch,sa,approve,comp,focus,gs,kaiBriefing,kaiLoading,kaiConnected,onKaiSettings,fetchBriefing,calEvts=[],gSignedIn}){
   const{schedule:blocks,totalPts}=sch;
@@ -482,6 +525,7 @@ function GrowthV({tasks,gs,lv,rtn,srm}){
     {PROJECTS.filter(p=>p.milestones.length>0&&(p.done.length>0||tasks.some(t=>t.project===p.id))).map(p=>{const pct=Math.round((p.done.length/p.milestones.length)*100);return(<div key={p.id} style={{border:"1px solid #1a1a2e",borderRadius:"8px",padding:"12px",marginBottom:"6px"}}><div style={{display:"flex",justifyContent:"space-between",marginBottom:"6px"}}><span style={{fontSize:"11px",fontWeight:500,color:"#ddd"}}>{p.emoji} {p.name}</span><span style={{fontSize:"14px",fontWeight:700,color:p.color,fontFamily:"JetBrains Mono"}}>{pct}%</span></div><div style={{height:5,borderRadius:3,background:"#2a2a2a",overflow:"hidden",marginBottom:"6px"}}><div style={{height:"100%",borderRadius:3,background:p.color,width:`${pct}%`}}/></div><div style={{display:"flex",gap:"3px",flexWrap:"wrap"}}>{p.milestones.map((m,i)=>(<span key={i} style={{fontSize:"8px",padding:"2px 6px",borderRadius:"8px",border:p.done.includes(i)?"none":"1px solid #1a1a2e",background:p.done.includes(i)?`${p.color}20`:"transparent",color:p.done.includes(i)?p.color:"#888"}}>{p.done.includes(i)?"✓ ":""}{m}</span>))}</div></div>)})}
     <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginTop:"14px",marginBottom:"8px"}}><span style={{fontSize:"12px",fontWeight:500,color:"#ddd"}}>ルーティン</span><button onClick={srm} style={{padding:"3px 8px",border:"1px solid #1e1e3a",borderRadius:"5px",background:"transparent",color:"#888",fontSize:"10px",cursor:"pointer",fontFamily:"inherit"}}>編集</button></div>
     {rtn.map(r=>(<div key={r.id} style={{padding:"6px 10px",borderRadius:"5px",background:"#141414",border:"1px solid #1a1a2e",marginBottom:"3px",display:"flex",justifyContent:"space-between",fontSize:"11px"}}><span style={{color:"#ddd"}}>{r.freq==="daily"?"毎日":"毎週月"} {r.time} — {r.title}</span><span style={{color:"#E60026",fontFamily:"JetBrains Mono"}}>+{r.pts}pt</span></div>))}
+    <BadgesPanel gs={gs} memberCount={memberCount} tasks={tasks}/>
   </div>);
 }
 
