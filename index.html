@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>club361 OPS</title>
+<title>club361° OPS</title>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
 <style>
 * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -58,7 +58,7 @@ const INITIAL_TASKS=[
 {id:"6",title:"club361 LP制作",project:"acquire",priority:"high",deadline:"",status:"To Do",note:"入会を促すページ",est_minutes:120,preferred_time:"morning"},
 {id:"7",title:"スポンサー候補企業リストアップ",project:"sponsor",priority:"medium",deadline:"",status:"To Do",note:"",est_minutes:60,preferred_time:"afternoon"},
 {id:"8",title:"既存部活の活動状況確認",project:"community",priority:"medium",deadline:"",status:"To Do",note:"停滞部活を特定",est_minutes:45,preferred_time:"afternoon"},
-{id:"9",title:"club361 OPS 活用開始",project:"dx",priority:"medium",deadline:"",status:"Doing",note:"Kai AI参謀と連携",est_minutes:30,preferred_time:"any"},
+{id:"9",title:"club361° OPS 活用開始",project:"dx",priority:"medium",deadline:"",status:"Doing",note:"Kai AI参謀と連携",est_minutes:30,preferred_time:"any"},
 {id:"10",title:"年間イベントカレンダー作成",project:"event",priority:"medium",deadline:"",status:"To Do",note:"",est_minutes:90,preferred_time:"morning"},
 ];
 
@@ -247,7 +247,7 @@ function App(){
     {cel&&<Cel pts={cel.pts} task={cel.task}/>}
     <div style={{padding:"14px 16px",borderBottom:"1px solid #1a1a2e",background:"linear-gradient(135deg,#0a0a0f,#12121f)"}}>
       <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:"8px",flexWrap:"wrap",gap:"6px"}}>
-        <div style={{display:"flex",alignItems:"center",gap:"8px"}}><span style={{fontSize:"20px"}}>⚡</span><h1 style={{margin:0,fontSize:"16px",fontWeight:700,color:"#E60026"}}>club361 OPS</h1><span style={{fontSize:"9px",color:"#555",fontFamily:"JetBrains Mono"}}>v2.1</span></div>
+        <div style={{display:"flex",alignItems:"center",gap:"8px"}}><span style={{fontSize:"20px"}}>⚡</span><h1 style={{margin:0,fontSize:"16px",fontWeight:700,color:"#E60026"}}>club361° OPS</h1><span style={{fontSize:"9px",color:"#555",fontFamily:"JetBrains Mono"}}>v2.1</span></div>
         <div style={{display:"flex",gap:"2px"}}>
           {[{id:"schedule",l:"⏰"},{id:"dashboard",l:"📋"},{id:"focus",l:"🎯"},{id:"gantt",l:"📅"},{id:"growth",l:"🚀"}].map(v=>(<button key={v.id} onClick={()=>v.id==="focus"?sf():setView(v.id)} style={{padding:"6px 10px",border:"none",borderRadius:"8px",background:view===v.id?"#1e1e3a":"transparent",color:view===v.id?"#fff":"#555",fontSize:"15px",cursor:"pointer"}}>{v.l}</button>))}
         </div>
